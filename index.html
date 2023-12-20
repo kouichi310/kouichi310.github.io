@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>科目選択と単位計算</title>
+</head>
+<body>
+    <h1>科目一覧</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>科目区分</th>
+                <th>必修区分</th>
+                <th>授業科目</th>
+                <th>単位数</th>
+            </tr>
+        </thead>
+        <tbody id="subjectList">
+            <!-- ここに科目情報を挿入する -->
+        </tbody>
+    </table>
+
+    <h2>選択した科目</h2>
+    <div id="selectedSubjects">
+        <!-- ここに選択した科目と単位数を表示する -->
+    </div>
+
+    <script>
+        // CSVファイルのデータをJavaScriptで読み込む
+        fetch('subject_information.csv')
+            .then(response => response.text())
+            .then(data => {
+                const rows = data.split('\n');
+                const subjectList = document.getElementById('subjectList');
+                for (let i = 1; i < rows.length; i++) {
+                    const cols = rows[i].split(',');
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${cols[0]}</td>
+                        <td>${cols[1]}</td>
+                        <td>${cols[2]}</td>
+                        <td>${cols[3]}</td>
+                    `;
+                    subjectList.appendChild(tr);
+                }
+            })
+            .catch(error => console.error(error));
+
+        // チェックボックスが変更されたときに単位数を計算する
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                let totalUnits = 0;
+                checkboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        totalUnits += parseInt(checkbox.value);
+                    }
+                });
+                const selectedSubjects = document.getElementById('selectedSubjects');
+                selectedSubjects.innerHTML = `選択した科目の合計単位数: ${totalUnits}`;
+            });
+        });
+    </script>
+</body>
+</html>
